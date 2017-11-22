@@ -39,6 +39,7 @@ timestamp=$(date +%s)
 distribution=${distribution:-"debian"}
 version=${version:-"stretch"}
 playbook=${playbook:-"playbook.yml"}
+inventory=${inventory:-"hosts"}
 requirements=${requirements:-"requirements.yml"}
 cleanup=${cleanup:-"true"}
 container_id=${container_id:-$timestamp}
@@ -88,11 +89,11 @@ test_action()
   
   # Test playbook syntax.
   printf "\n${heading}Checking Ansible playbook syntax.${neutral}\n"
-  docker exec --tty ${container_id} env TERM=xterm ansible-playbook playbooks/${playbook} --syntax-check
+  docker exec --tty ${container_id} env TERM=xterm ansible-playbook playbooks/${playbook} -i ${inventory} --syntax-check
   
   # Run the playbook.
   printf "\n${heading}Running Ansible playbook.${neutral}\n"
-  docker exec ${container_id} env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook playbooks/${playbook}
+  docker exec ${container_id} env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook playbooks/${playbook} -i ${inventory}
   
   # If testing for idempotence is configured.
   if [ "${test_idempotence}" = true ]; then
@@ -100,7 +101,7 @@ test_action()
     idempotence=$(mktemp)
     # Run the playbook again and record the output.
     printf "\n${heading}Testing Ansible playbook idempotence.${neutral}\n"
-    docker exec ${container_id} ansible-playbook playbooks/${playbook} | tee -a ${idempotence}
+    docker exec ${container_id} ansible-playbook playbooks/${playbook} -i ${inventory} | tee -a ${idempotence}
     tail ${idempotence} | grep -q 'changed=0.*failed=0' \
       && (printf ${green}"Idempotence test: [pass]"${neutral}) \
       || (printf ${red}"Idempotence test: [fail]"${neutral} && exit 1)
