@@ -50,13 +50,13 @@ base_url=${base_url:-"https://raw.githubusercontent.com/ontic/ansible-playbook-t
 # Set variables for each operating system which configure the container.
 if [ "${distribution}/${version}" = "debian/9" ]; then
   init="/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=${PWD}/username:/home/${username}"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro}"
 elif [ "${distribution}/${version}" = "ubuntu/16.04" ]; then
   init="/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=${PWD}/username:/home/${username}"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 elif [ "${distribution}/${version}" = "centos/7" ]; then
   init="/usr/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=${PWD}/username:/home/${username}"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 fi
 
 # Build the container
