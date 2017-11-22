@@ -76,8 +76,6 @@ build_action()
   fi
 }
 
-ANSIBLE_VAULT_PASSWORD
-
 # If an environment variable exists with an Ansible Vault password.
 if [ -z "${ANSIBLE_VAULT_PASSWORD}" ]; then
   # Set the file path that will contain the password.
