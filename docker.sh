@@ -41,6 +41,7 @@ version=${version:-"stretch"}
 playbook=${playbook:-"playbook.yml"}
 inventory=${inventory:-"hosts"}
 requirements=${requirements:-"requirements.yml"}
+username=${username:-"username"}
 cleanup=${cleanup:-"true"}
 container_id=${container_id:-$timestamp}
 test_idempotence=${test_idempotence:-"true"}
@@ -49,13 +50,13 @@ base_url=${base_url:-"https://raw.githubusercontent.com/ontic/ansible-playbook-t
 # Set variables for each operating system which configure the container.
 if [ "${distribution}/${version}" = "debian/9" ]; then
   init="/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=${PWD}/username:/home/${username}"
 elif [ "${distribution}/${version}" = "ubuntu/16.04" ]; then
   init="/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=${PWD}/username:/home/${username}"
 elif [ "${distribution}/${version}" = "centos/7" ]; then
   init="/usr/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=${PWD}/username:/home/${username}"
 fi
 
 # Build the container
@@ -68,7 +69,7 @@ build_action()
   printf "${heading}Starting Docker container: ${distribution}/${version}${neutral}\n"
   docker pull "${distribution}:${version}"
   docker build --rm=true --file=tests/Dockerfile --tag="${distribution}-${version}:ansible" .
-  docker run --detach --volume="${PWD}:/home/awesomecorp:/etc/ansible/playbook_under_test:rw" --name="${container_id}" ${opts} "${distribution}-${version}:ansible" ${init}
+  docker run --detach --volume="${PWD}:/etc/ansible/playbook_under_test:rw" --name="${container_id}" ${opts} "${distribution}-${version}:ansible" ${init}
   
   # If the distribution is either Debian or Ubuntu.
   if [ "${distribution}" = "debian" ] || [ "${distribution}" = "ubuntu" ]; then
