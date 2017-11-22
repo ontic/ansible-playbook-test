@@ -28,4 +28,5 @@ RUN rm -f /sbin/initctl \
 RUN mkdir -p /etc/ansible/playbook_under_test \
   && printf "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 
+# Set working directory.
 WORKDIR /etc/ansible/playbook_under_test

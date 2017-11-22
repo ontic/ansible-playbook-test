@@ -23,8 +23,10 @@ RUN yum makecache fast \
 RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 # Install Ansible inventory file.
-RUN mkdir -p /etc/ansible \
-  && printf "[local]\nlocalhost ansible_connection=local" >> /etc/ansible/hosts
+RUN mkdir -p /etc/ansible/playbook_under_test \
+  && printf "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 
+# Set working directory.
+WORKDIR /etc/ansible/playbook_under_test
 VOLUME ["/sys/fs/cgroup"]
 CMD ["/usr/sbin/init"]
