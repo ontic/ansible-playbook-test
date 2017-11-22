@@ -68,7 +68,7 @@ build_action()
   printf "${heading}Starting Docker container: ${distribution}/${version}${neutral}\n"
   docker pull "${distribution}:${version}"
   docker build --rm=true --file=tests/Dockerfile --tag="${distribution}-${version}:ansible" .
-  docker run --detach --volume="${PWD}:/home:/etc/ansible/playbook_under_test:rw" --name="${container_id}" ${opts} "${distribution}-${version}:ansible" ${init}
+  docker run --detach --volume="${PWD}:/home/awesomecorp:/etc/ansible/playbook_under_test:rw" --name="${container_id}" ${opts} "${distribution}-${version}:ansible" ${init}
   
   # If the distribution is either Debian or Ubuntu.
   if [ "${distribution}" = "debian" ] || [ "${distribution}" = "ubuntu" ]; then
