@@ -25,5 +25,7 @@ RUN rm -f /sbin/initctl \
   && chmod +x /sbin/initctl
 
 # Install Ansible inventory file.
-RUN mkdir -p /etc/ansible \
+RUN mkdir -p /etc/ansible/playbook_under_test \
   && printf "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
+
+WORKDIR /etc/ansible/playbook_under_test
