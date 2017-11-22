@@ -16,7 +16,7 @@ rm -f /lib/systemd/system/anaconda.target.wants/*;
 RUN yum makecache fast \
  && yum -y install deltarpm epel-release initscripts \
  && yum -y update \
- && yum -y install sudo which wget ansible \
+ && yum -y install sudo which wget ansible git \
  && yum clean all
 
 # Disable requiretty.
