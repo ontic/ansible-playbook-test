@@ -26,6 +26,7 @@ RUN rm -f /sbin/initctl \
 
 # Install Ansible inventory file.
 RUN mkdir -p /etc/ansible/playbook_under_test \
+  && mkdir -p /home/awesomecorp \
   && printf "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 
 # Set working directory.
