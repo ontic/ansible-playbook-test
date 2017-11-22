@@ -76,6 +76,16 @@ build_action()
   fi
 }
 
+ANSIBLE_VAULT_PASSWORD
+
+# If an environment variable exists with an Ansible Vault password.
+if [ -z "${ANSIBLE_VAULT_PASSWORD}" ]; then
+  # Set the file path that will contain the password.
+  password_file="/etc/ansible/playbook_under_test/password.txt"
+  # Output the password into the password file.
+  docker exec --tty ${container_id} env TERM=xterm bash -c "touch ${password_file} && echo '${ANSIBLE_VAULT_PASSWORD}' >> ${password_file}"
+fi
+
 # Test the role
 test_action()
 {
