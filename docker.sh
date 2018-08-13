@@ -50,8 +50,11 @@ base_url=${base_url:-"https://raw.githubusercontent.com/ontic/ansible-playbook-t
 # Set variables for each operating system which configure the container.
 if [ "${distribution}/${version}" = "debian/9" ]; then
   init="/lib/systemd/systemd"
-  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro}"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 elif [ "${distribution}/${version}" = "ubuntu/16.04" ]; then
+  init="/lib/systemd/systemd"
+  opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+elif [ "${distribution}/${version}" = "ubuntu/18.04" ]; then
   init="/lib/systemd/systemd"
   opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 elif [ "${distribution}/${version}" = "centos/7" ]; then
@@ -78,23 +81,23 @@ build_action()
   fi
 }
 
-# Test the role
+# Test the playbook
 test_action()
 { 
   # If a requirements file exists.
   if [ -f "${PWD}/${requirements}" ]; then
     # Install roles dependencies using Ansible Galaxy.
     printf "\n${heading}Installing Ansible role dependencies.${neutral}\n"
-    docker exec --tty ${container_id} env TERM=xterm ansible-galaxy install -r ${requirements}
+    docker exec --tty ${container_id} env TERM=xterm ansible-galaxy install -r ${requirements} -p ./roles
   fi
   
   # Test playbook syntax.
   printf "\n${heading}Checking Ansible playbook syntax.${neutral}\n"
-  docker exec --tty ${container_id} env TERM=xterm ansible-playbook playbooks/${playbook} -i ${inventory} --syntax-check
+  docker exec --tty ${container_id} env TERM=xterm ansible-playbook playbooks/${playbook} -i inventory/${inventory} --syntax-check
   
   # Run the playbook.
   printf "\n${heading}Running Ansible playbook.${neutral}\n"
-  docker exec ${container_id} env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook playbooks/${playbook} -i ${inventory}
+  docker exec ${container_id} env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook playbooks/${playbook} -i inventory/${inventory}
   
   # If testing for idempotence is configured.
   if [ "${test_idempotence}" = true ]; then
@@ -102,7 +105,7 @@ test_action()
     idempotence=$(mktemp)
     # Run the playbook again and record the output.
     printf "\n${heading}Testing Ansible playbook idempotence.${neutral}\n"
-    docker exec ${container_id} ansible-playbook playbooks/${playbook} -i ${inventory} | tee -a ${idempotence}
+    docker exec ${container_id} ansible-playbook playbooks/${playbook} -i inventory/${inventory} | tee -a ${idempotence}
     tail ${idempotence} | grep -q 'changed=0.*failed=0' \
       && (printf ${green}"Idempotence test: [pass]"${neutral}) \
       || (printf ${red}"Idempotence test: [fail]"${neutral} && exit 1)
